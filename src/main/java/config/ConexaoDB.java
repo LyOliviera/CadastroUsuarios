@@ -1,20 +1,61 @@
+package main.java.config;
+
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class ConexaoDB {
-    public static void main(String[] args) {
-        String dbUrl = "jdbc:mysql://127.0.0.1:3306/dbusuarios";
-        String dbUsuario = "root";
-        String dbSenha = "123456";
 
-        System.out.println("Estabelecendo conexão com o banco de dados");
+    public static void main(String[] args) {}
 
-        try (Connection dbConexao = DriverManager.getConnection(dbUrl,dbUsuario,dbSenha)) {
-            System.out.println("Conexão com banco de dados finalizada com sucesso");
-        } catch (SQLException e) {
-            System.err.println("Não foi possível conectar com o banco de dados");
-            e.printStackTrace();
+    private static  Connection connection = null;
+
+    private static String dbUrl;
+    private static String dbuser;
+    private static String dbsenha;
+
+
+    public static Connection getConections(){
+        try {
+            if (connection == null) {
+                connection = DriverManager.getConnection(dbUrl,dbuser,dbsenha);
+                System.out.println("Sucesso ao estabelecer a conexão com o banco de dados");
+            } else if (connection != null) {
+                System.out.println("Já existe uma conexão com o banco de dados e será reutilizada");
+            }
+        } catch (SQLException sqlException) { throw new RuntimeException(sqlException);}
+        return connection;
+
+    }
+
+
+    private static Properties loadproperties() {
+        try (FileInputStream fileInputStream = new FileInputStream("db.properties")) {
+            Properties properties = new Properties();
+            properties.load(fileInputStream);
+            System.out.println("Sucesso ao carregar as propriedades do banco de dados. Pronto para tentativa de conexão.");
+            return properties;
+        } catch (IOException e) {
+            System.err.println("Erro encontrado ao carregar as configurações do banco de dados. Verifique o arquivo 'db.properties'.");
+            throw new RuntimeException(e);
         }
     }
+
+    static {
+        Properties properties = loadproperties();
+
+        String dbhost = properties.getProperty("dbhost");
+        String dbporta = properties.getProperty("dbporta");
+        String database = properties.getProperty("database");
+
+        dbuser = properties.getProperty("dbuser");
+        dbsenha = properties.getProperty("dbsenha");
+        dbUrl = "jdbc:mysql://" + dbhost + ":" + dbporta + "/" + database;
+    }
+
+
+
 }
