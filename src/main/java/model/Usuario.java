@@ -16,6 +16,7 @@ public class Usuario {
     private Boolean ativo;
     private LocalDateTime dtlimite;
 
+
     public int getId() {
         return id;
     }
