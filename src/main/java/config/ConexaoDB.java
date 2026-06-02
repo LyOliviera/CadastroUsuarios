@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 public class ConexaoDB {
 
@@ -56,6 +58,24 @@ public class ConexaoDB {
         dbUrl = "jdbc:mysql://" + dbhost + ":" + dbporta + "/" + database;
     }
 
+    public static void closeStatement(Statement statement) {
+        if (statement != null) {
+            try {
+                statement.close();
+            } catch (SQLException sqlException) {
+                throw new RuntimeException(sqlException);
+            }
+        }
+    }
 
-
+    public static void closeResultSet(ResultSet resultSet) {
+        if (resultSet != null) {
+            try {
+                resultSet.close();
+            } catch (SQLException sqlException) {
+                throw new RuntimeException(sqlException);
+            }
+        }
+    }
 }
+

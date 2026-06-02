@@ -1,5 +1,6 @@
 package main.java.model;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -12,9 +13,11 @@ public class Usuario {
     private String email;
     private String senha;
     private LocalDate dtnascimento;
-    private String telefone;
+    private Long telefone;
     private Boolean ativo;
     private LocalDateTime dtlimite;
+    private LocalDateTime dtalter;
+    private LocalDateTime dtcriado;
 
 
     public int getId() {
@@ -73,11 +76,11 @@ public class Usuario {
         this.dtnascimento = dtnascimento;
     }
 
-    public String getTelefone() {
+    public Long getTelefone() {
         return telefone;
     }
 
-    public void setTelefone(String telefone) {
+    public void setTelefone(Long telefone) {
         this.telefone = telefone;
     }
 
@@ -97,6 +100,7 @@ public class Usuario {
         this.dtlimite = dtlimite;
     }
 
+
     public LocalDateTime getDtalter() {
         return dtalter;
     }
@@ -113,6 +117,21 @@ public class Usuario {
         this.dtcriado = dtcriado;
     }
 
-    private LocalDateTime dtalter;
-    private LocalDateTime dtcriado;
+
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", nome='" + nome + '\'' +
+                ", cpf='" + cpf + '\'' +
+                ", email='" + email + '\'' +
+                ", dtnascimento=" + dtnascimento +
+                ", telefone='" + telefone + '\'' +
+                ", ativo=" + ativo +
+                ", dtlimite=" + dtlimite +
+                ", dtalter=" + dtalter +
+                ", dtcriado=" + dtcriado +
+                '}';
+    }
 }

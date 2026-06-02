@@ -1,0 +1,178 @@
+package main.java.dao;
+
+import main.java.config.ConexaoDB;
+import main.java.exception.UsuarioNotFound;
+import main.java.listener.*;
+import main.java.model.Usuario;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class UsuarioDao implements CrudDao {
+    private final Connection connection;
+    private final   CrudListener listener;
+
+    public UsuarioDao(Connection connection, CrudListener listener) {
+        this.connection = connection;
+        this.listener = listener;
+    }
+
+    @Override
+    public void insert(Object horcrux) {
+        this.listener.prePersist(horcrux);
+        Usuario usuario = (Usuario) horcrux;
+        PreparedStatement preparedStatement = null;
+
+        try {
+            String sqlInsert = "Insert into usuario (username, nome, cpf, email, senha, dtnascimento, telefone, ativo, dtlimite, dtalter, dtcriado) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            preparedStatement = connection.prepareStatement(sqlInsert);
+            preparedStatement.setString(1, usuario.getUsername());
+            preparedStatement.setString(2, usuario.getNome());
+            preparedStatement.setString(3, usuario.getCpf());
+            preparedStatement.setString(4, usuario.getEmail());
+            preparedStatement.setString(5, usuario.getSenha());
+            preparedStatement.setDate(6, usuario.getDtnascimento() != null ? java.sql.Date.valueOf(usuario.getDtnascimento()) : null);
+            preparedStatement.setLong(7, usuario.getTelefone());
+            preparedStatement.setBoolean(8, usuario.getAtivo());
+            preparedStatement.setTimestamp(9, usuario.getDtlimite() != null ? java.sql.Timestamp.valueOf(usuario.getDtlimite()) : null);
+            preparedStatement.setTimestamp(10, usuario.getDtalter() != null ? java.sql.Timestamp.valueOf(usuario.getDtalter()) : null);
+            preparedStatement.setTimestamp(11, java.sql.Timestamp.valueOf(usuario.getDtcriado()));
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            ConexaoDB.closeStatement(preparedStatement);
+        }
+    }
+
+    @Override
+    public int updateByID(Object horcrux) {
+        this.listener.prePersist(horcrux);
+        Usuario usuario = (Usuario) horcrux;
+        PreparedStatement preparedStatement = null;
+        findById(usuario.getId());
+
+        try{
+            String sqlUpdateById = "Update usuario SET username = ?, nome = ?, cpf = ?, email = ?, senha = ?, dtnascimento = ?, telefone = ?, ativo = ?, dtlimite = ?, dtalter = ?, dtcriado = ? where id = ?";
+            preparedStatement = connection.prepareStatement(sqlUpdateById);
+
+            preparedStatement.setString(1, usuario.getUsername());
+            preparedStatement.setString(2, usuario.getNome());
+            preparedStatement.setString(3, usuario.getCpf());
+            preparedStatement.setString(4, usuario.getEmail());
+            preparedStatement.setString(5, usuario.getSenha());
+            preparedStatement.setDate(6, usuario.getDtnascimento() != null ? java.sql.Date.valueOf(usuario.getDtnascimento()) : null);
+            preparedStatement.setLong(7, usuario.getTelefone());
+            preparedStatement.setBoolean(8, usuario.getAtivo());
+            preparedStatement.setTimestamp(9, usuario.getDtlimite() != null ? java.sql.Timestamp.valueOf(usuario.getDtlimite()) : null);
+            preparedStatement.setTimestamp(10, java.sql.Timestamp.valueOf(java.time.LocalDateTime.now()));
+            preparedStatement.setTimestamp(11, java.sql.Timestamp.valueOf(usuario.getDtcriado()));
+            preparedStatement.setInt(12, usuario.getId());
+
+            return preparedStatement.executeUpdate();
+
+        } catch (SQLException sqlException) {
+            throw new RuntimeException(sqlException);
+        } finally {
+            ConexaoDB.closeStatement(preparedStatement);
+        }
+    }
+
+    @Override
+    public int deleteById(Integer id) {
+        PreparedStatement preparedStatement = null;
+        findById(id);
+        try{
+            String sqlDeleteById = "DELETE from usuario where id = ?";
+
+            preparedStatement = connection.prepareStatement(sqlDeleteById);
+            preparedStatement.setInt(1,id);
+
+            return preparedStatement.executeUpdate();
+
+        } catch (SQLException sqlException) {
+            throw new RuntimeException(sqlException);
+        } finally {
+            ConexaoDB.closeStatement(preparedStatement);
+        }
+    }
+
+    @Override
+    public Object findById(Integer id) {
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try{
+            String sqlConsultaById = "Select * from usuario where id = ?";
+            preparedStatement = connection.prepareStatement(sqlConsultaById);
+            preparedStatement.setInt(1,id);
+
+            resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()){
+                return getUsuario(resultSet);
+            } else {
+                throw new UsuarioNotFound("Usuário Not Found");
+            }
+
+        } catch (SQLException sqlException) {
+            throw new RuntimeException(sqlException);
+        }finally {
+            ConexaoDB.closeStatement(preparedStatement);
+            ConexaoDB.closeResultSet(resultSet);
+        }
+
+    }
+
+    @Override
+    public List<Object> findAll() {
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        List<Object> listUsuario = new ArrayList<>();
+
+        try{
+            String sqlConsultaAll = "Select * from usuario";
+            preparedStatement = connection.prepareStatement(sqlConsultaAll);
+
+            resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()){
+                listUsuario.add(getUsuario(resultSet));
+            }
+            return listUsuario;
+        } catch (SQLException sqlException) {
+            throw new RuntimeException(sqlException);
+        }finally {
+            ConexaoDB.closeStatement(preparedStatement);
+            ConexaoDB.closeResultSet(resultSet);
+        }
+    }
+
+
+    private Usuario getUsuario(ResultSet resultSet) throws SQLException{
+        Usuario usuario = new Usuario();
+        usuario.setId(resultSet.getInt("id"));
+        usuario.setUsername(resultSet.getString("username"));
+        usuario.setNome(resultSet.getString("nome"));
+        usuario.setCpf(resultSet.getString("cpf"));
+        usuario.setEmail(resultSet.getString("email"));
+        usuario.setSenha(resultSet.getString("senha"));
+        usuario.setDtnascimento(resultSet.getDate("dtnascimento").toLocalDate());
+        usuario.setTelefone(resultSet.getLong("telefone"));
+        usuario.setAtivo(resultSet.getBoolean("ativo"));
+        usuario.setDtlimite(resultSet.getTimestamp("dtlimite").toLocalDateTime());
+        usuario.setDtalter(resultSet.getTimestamp("dtalter").toLocalDateTime());
+        usuario.setDtcriado(resultSet.getTimestamp("dtcriado").toLocalDateTime());
+        return  usuario;
+    }
+
+}
+
