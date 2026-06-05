@@ -173,6 +173,88 @@ public class UsuarioDao implements CrudDao {
         usuario.setDtcriado(resultSet.getTimestamp("dtcriado").toLocalDateTime());
         return  usuario;
     }
+    public Object findByUsername(String username, boolean ativos) {
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
 
+        try {
+            String sqlConsultaByUsername = "Select * from usuario where username = ?";
+            if (ativos){
+                sqlConsultaByUsername = sqlConsultaByUsername + " and ativo = true";
+            }
+
+            preparedStatement = connection.prepareStatement(sqlConsultaByUsername);
+            preparedStatement.setString(1, username);
+
+            resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return getUsuario(resultSet);
+            } else {
+                return null;
+            }
+        } catch (SQLException sqlException) {
+            throw new RuntimeException(sqlException);
+        } finally {
+            ConexaoDB.closeResultSet(resultSet);
+            ConexaoDB.closeStatement(preparedStatement);
+        }
+    }
+    public Object findByCpf(String cpf,boolean ativos) {
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            String sqlConsultaByCpf = "Select * from usuario where cpf = ?";
+            if (ativos){
+                sqlConsultaByCpf = sqlConsultaByCpf + " and ativo = true";
+            }
+            preparedStatement = connection.prepareStatement(sqlConsultaByCpf);
+            preparedStatement.setString(1, cpf);
+
+            resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return getUsuario(resultSet);
+            } else {
+                return null;
+            }
+
+        } catch (SQLException sqlException) {
+            throw new RuntimeException(sqlException);
+        } finally {
+            ConexaoDB.closeStatement(preparedStatement);
+            ConexaoDB.closeResultSet(resultSet);
+        }
+    }
+
+    public Object findByEmail(String email,boolean ativos) {
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            String sqlConsultaByEmail = "Select * from usuario where email = ?";
+            if (ativos){
+                sqlConsultaByEmail = sqlConsultaByEmail + " and ativo = true";
+            }
+
+            preparedStatement = connection.prepareStatement(sqlConsultaByEmail);
+            preparedStatement.setString(1, email);
+
+            resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return getUsuario(resultSet);
+            } else {
+                return null;
+            }
+
+        } catch (SQLException sqlException) {
+            throw new RuntimeException(sqlException);
+        } finally {
+            ConexaoDB.closeStatement(preparedStatement);
+            ConexaoDB.closeResultSet(resultSet);
+        }
+    }
 }
 
