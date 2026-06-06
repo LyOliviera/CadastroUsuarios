@@ -106,7 +106,7 @@ public class UsuarioDao implements CrudDao {
     }
 
     @Override
-    public Object findById(Integer id) {
+    public Object findById(Integer id,boolean ativos) {
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
 
@@ -114,6 +114,9 @@ public class UsuarioDao implements CrudDao {
             String sqlConsultaById = "Select * from usuario where id = ?";
             preparedStatement = connection.prepareStatement(sqlConsultaById);
             preparedStatement.setInt(1,id);
+            if (ativos){
+                sqlConsultaById = sqlConsultaById + " and ativo = true";
+            }
 
             resultSet = preparedStatement.executeQuery();
 
