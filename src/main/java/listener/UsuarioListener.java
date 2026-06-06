@@ -128,7 +128,10 @@ public class UsuarioListener implements CrudListener {
 
     public void preRemove(Object horcrux){
         Usuario usuario = (Usuario) horcrux;
-
+        if (usuario.getId() <= 0) {
+            throw new IllegalArgumentException("ID inválido para exclusão.");
+        }
+        usuarioDao.findById(usuario.getId(), false);
     }
 
     @Override

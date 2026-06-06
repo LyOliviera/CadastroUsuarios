@@ -22,7 +22,7 @@ public class ConexaoDB {
 
     public static Connection getConections(){
         try {
-            if (connection == null) {
+            if (connection == null || connection.isClosed()) {
                 connection = DriverManager.getConnection(dbUrl,dbuser,dbsenha);
                 System.out.println("Sucesso ao estabelecer a conexão com o banco de dados");
             } else if (connection != null) {
@@ -38,7 +38,7 @@ public class ConexaoDB {
         try (FileInputStream fileInputStream = new FileInputStream("db.properties")) {
             Properties properties = new Properties();
             properties.load(fileInputStream);
-            System.out.println("Sucesso ao carregar as propriedades do banco de dados. Pronto para tentativa de conexão.");
+            System.out.println("Sucesso ao carregar as propriedades do banco de dados.");
             return properties;
         } catch (IOException e) {
             System.err.println("Erro encontrado ao carregar as configurações do banco de dados. Verifique o arquivo 'db.properties'.");

@@ -9,8 +9,11 @@ public class SenhaValidador {
         if (senha == null) {
             return false;
         }
-        return true;
-    }
+            String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$";
+
+            return senha.matches(regex);
+        }
+
     public static String criptografarSenha(String senhaLimpa) {
         if (senhaLimpa == null || senhaLimpa.trim().isEmpty()) {
             return null;

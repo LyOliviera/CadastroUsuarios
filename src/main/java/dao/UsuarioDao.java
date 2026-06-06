@@ -61,21 +61,19 @@ public class UsuarioDao implements CrudDao {
         findById(usuario.getId(), false);
 
         try{
-            String sqlUpdateById = "Update usuario SET username = ?, nome = ?, cpf = ?, email = ?, senha = ?, dtnascimento = ?, telefone = ?, ativo = ?, dtlimite = ?, dtalter = ?, dtcriado = ? where id = ?";
+            String sqlUpdateById = "Update usuario SET  nome = ?, cpf = ?, email = ?, senha = ?, dtnascimento = ?, telefone = ?, ativo = ?, dtlimite = ?, dtalter = ? where id = ?";
             preparedStatement = connection.prepareStatement(sqlUpdateById);
 
-            preparedStatement.setString(1, usuario.getUsername());
-            preparedStatement.setString(2, usuario.getNome());
-            preparedStatement.setString(3, usuario.getCpf());
-            preparedStatement.setString(4, usuario.getEmail());
-            preparedStatement.setString(5, usuario.getSenha());
-            preparedStatement.setDate(6, usuario.getDtnascimento() != null ? java.sql.Date.valueOf(usuario.getDtnascimento()) : null);
-            preparedStatement.setLong(7, usuario.getTelefone());
-            preparedStatement.setBoolean(8, usuario.getAtivo());
-            preparedStatement.setTimestamp(9, usuario.getDtlimite() != null ? java.sql.Timestamp.valueOf(usuario.getDtlimite()) : null);
-            preparedStatement.setTimestamp(10, java.sql.Timestamp.valueOf(java.time.LocalDateTime.now()));
-            preparedStatement.setTimestamp(11, java.sql.Timestamp.valueOf(usuario.getDtcriado()));
-            preparedStatement.setInt(12, usuario.getId());
+            preparedStatement.setString(1, usuario.getNome());
+            preparedStatement.setString(2, usuario.getCpf());
+            preparedStatement.setString(3, usuario.getEmail());
+            preparedStatement.setString(4, usuario.getSenha());
+            preparedStatement.setDate(5, usuario.getDtnascimento() != null ? java.sql.Date.valueOf(usuario.getDtnascimento()) : null);
+            preparedStatement.setLong(6, usuario.getTelefone());
+            preparedStatement.setBoolean(7, usuario.getAtivo());
+            preparedStatement.setTimestamp(8, usuario.getDtlimite() != null ? java.sql.Timestamp.valueOf(usuario.getDtlimite()) : null);
+            preparedStatement.setTimestamp(9, java.sql.Timestamp.valueOf(java.time.LocalDateTime.now()));
+            preparedStatement.setInt(10, usuario.getId());
 
             return preparedStatement.executeUpdate();
 
@@ -89,7 +87,10 @@ public class UsuarioDao implements CrudDao {
     @Override
     public int deleteById(Integer id) {
         PreparedStatement preparedStatement = null;
-        findById(id,false);
+        Usuario usuario = new Usuario();
+        usuario.setId(id);
+        this.listener.preRemove(usuario);
+
         try{
             String sqlDeleteById = "DELETE from usuario where id = ?";
 
@@ -160,7 +161,7 @@ public class UsuarioDao implements CrudDao {
     }
 
 
-    private Usuario getUsuario(ResultSet resultSet) throws SQLException{
+    private Usuario getUsuario(ResultSet resultSet) throws SQLException {
         Usuario usuario = new Usuario();
         usuario.setId(resultSet.getInt("id"));
         usuario.setUsername(resultSet.getString("username"));
@@ -168,13 +169,34 @@ public class UsuarioDao implements CrudDao {
         usuario.setCpf(resultSet.getString("cpf"));
         usuario.setEmail(resultSet.getString("email"));
         usuario.setSenha(resultSet.getString("senha"));
-        usuario.setDtnascimento(resultSet.getDate("dtnascimento").toLocalDate());
         usuario.setTelefone(resultSet.getLong("telefone"));
         usuario.setAtivo(resultSet.getBoolean("ativo"));
-        usuario.setDtlimite(resultSet.getTimestamp("dtlimite").toLocalDateTime());
-        usuario.setDtalter(resultSet.getTimestamp("dtalter").toLocalDateTime());
-        usuario.setDtcriado(resultSet.getTimestamp("dtcriado").toLocalDateTime());
-        return  usuario;
+
+        // 1. Valida a Data de Nascimento
+        java.sql.Date sqlDtNascimento = resultSet.getDate("dtnascimento");
+        if (sqlDtNascimento != null) {
+            usuario.setDtnascimento(sqlDtNascimento.toLocalDate());
+        }
+
+        // 2. Valida a Data Limite
+        java.sql.Timestamp sqlDtLimite = resultSet.getTimestamp("dtlimite");
+        if (sqlDtLimite != null) {
+            usuario.setDtlimite(sqlDtLimite.toLocalDateTime());
+        }
+
+        // 3. Valida a Data de Alteração
+        java.sql.Timestamp sqlDtAlter = resultSet.getTimestamp("dtalter");
+        if (sqlDtAlter != null) {
+            usuario.setDtalter(sqlDtAlter.toLocalDateTime());
+        }
+
+        // 4. Valida a Data de Criação
+        java.sql.Timestamp sqlDtCriado = resultSet.getTimestamp("dtcriado");
+        if (sqlDtCriado != null) {
+            usuario.setDtcriado(sqlDtCriado.toLocalDateTime());
+        }
+
+        return usuario;
     }
     public Object findByUsername(String username, boolean ativos) {
         PreparedStatement preparedStatement = null;

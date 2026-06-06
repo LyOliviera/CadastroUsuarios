@@ -11,13 +11,9 @@ import java.util.List;
 public class UsuarioController {
 
     public UsuarioController() {
-
     }
 
-    //Controller utilizando try-with-resources -> try(conexao)throws Exception {Condições}//
-
     public Usuario salvarUsuario(Usuario usuarioNovo) throws Exception {
-
         try (Connection conexao = ConexaoDB.getConections()) {
             CrudListener listener = new UsuarioListener();
             UsuarioDao usuarioDao = new UsuarioDao(conexao, listener);
@@ -30,28 +26,27 @@ public class UsuarioController {
                 usuarioDao.insert(usuarioNovo);
 
                 Usuario usuarioAposInsert = (Usuario) usuarioDao.findByCpf(usuarioNovo.getCpf(), true);
-
-                System.out.println("Novo usuário inserido no bano de dados com sucesso.");
+                System.out.println("Novo usuário inserido no banco de dados com sucesso.");
                 return usuarioAposInsert;
 
-            } else { usuarioNovo.setDtalter(java.time.LocalDateTime.now());
-
+            } else {
+                usuarioNovo.setDtalter(java.time.LocalDateTime.now());
                 usuarioDao.updateByID(usuarioNovo);
 
                 Usuario usuarioAposUpdate = (Usuario) usuarioDao.findByCpf(usuarioNovo.getCpf(), true);
-
                 if (usuarioAposUpdate != null) {
                     System.out.println("Usuário atulizado com sucesso.");
                     return usuarioAposUpdate;
-                } throw new IllegalArgumentException("Usuário não encontrado para atualização");
+                }
+                throw new IllegalArgumentException("Usuário não encontrado para atualização");
             }
         }
     }
 
-
     public boolean excluirUsuario(int id) throws Exception {
         try (Connection conexao = ConexaoDB.getConections()) {
-            UsuarioDao usuarioDao = new UsuarioDao(conexao, null);
+            CrudListener listener = new UsuarioListener();
+            UsuarioDao usuarioDao = new UsuarioDao(conexao, listener);
 
             int usuarioDeletado = usuarioDao.deleteById(id);
             return usuarioDeletado > 0;
@@ -60,18 +55,19 @@ public class UsuarioController {
 
     public Usuario buscarUsuarioPorId(int id) throws Exception {
         try (Connection conexao = ConexaoDB.getConections()) {
-            UsuarioDao usuarioDao = new UsuarioDao(conexao, null);
+            CrudListener listener = new UsuarioListener();
+            UsuarioDao usuarioDao = new UsuarioDao(conexao, listener);
 
-            return (Usuario) usuarioDao.findById(id);
+            return (Usuario) usuarioDao.findById(id, false);
         }
     }
 
     public List<Usuario> listarTodosUsuarios() throws Exception {
         try (Connection conexao = ConexaoDB.getConections()) {
-            UsuarioDao usuarioDao = new UsuarioDao(conexao, null);
+            CrudListener listener = new UsuarioListener();
+            UsuarioDao usuarioDao = new UsuarioDao(conexao, listener);
 
             return (List<Usuario>) (List<?>) usuarioDao.findAll();
         }
     }
 }
-

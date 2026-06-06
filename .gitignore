@@ -23,6 +23,7 @@ bin/
 /nbdist/
 /.nb-gradle/
 .idea/
+db.properties
 
 
 ### VS Code ###

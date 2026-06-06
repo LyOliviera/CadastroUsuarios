@@ -1,8 +1,6 @@
 package main.java.util;
 
 public class EmailValidador {
-   public static existeEmail{};
-
    public static boolean isValido(String email) {
 
       if(!email.contains("@")) {
