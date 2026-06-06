@@ -58,7 +58,7 @@ public class UsuarioDao implements CrudDao {
         this.listener.prePersist(horcrux);
         Usuario usuario = (Usuario) horcrux;
         PreparedStatement preparedStatement = null;
-        findById(usuario.getId());
+        findById(usuario.getId(), false);
 
         try{
             String sqlUpdateById = "Update usuario SET username = ?, nome = ?, cpf = ?, email = ?, senha = ?, dtnascimento = ?, telefone = ?, ativo = ?, dtlimite = ?, dtalter = ?, dtcriado = ? where id = ?";
@@ -89,7 +89,7 @@ public class UsuarioDao implements CrudDao {
     @Override
     public int deleteById(Integer id) {
         PreparedStatement preparedStatement = null;
-        findById(id);
+        findById(id,false);
         try{
             String sqlDeleteById = "DELETE from usuario where id = ?";
 
@@ -106,7 +106,7 @@ public class UsuarioDao implements CrudDao {
     }
 
     @Override
-    public Object findById(Integer id,boolean ativos) {
+    public Object findById(Integer id, boolean ativos) {
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
 

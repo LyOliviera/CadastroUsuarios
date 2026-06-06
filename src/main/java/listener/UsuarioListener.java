@@ -99,6 +99,13 @@ public class UsuarioListener implements CrudListener {
         if (senhaValida == false) {
             throw new IllegalArgumentException("Essa senha não atende aos requisitos. Ela deve conter no mínimo 8 caractere, uma letra maiúscula e uma minúscula, um numeral, e um símbolo.");
         }
+
+        try{
+            String senhaCodificada = SenhaValidador.criptografarSenha(usuario.getSenha());
+            usuario.setSenha(senhaCodificada);
+        } catch (Exception e) {
+            throw new RuntimeException("Não foi possível criptografar a senha do usuário", e);
+        }
         /*Valida Data de Nascimento*/
 
         if (usuario.getDtnascimento() != null) {
