@@ -31,12 +31,13 @@ public class UsuarioController {
 
             } else {
                 usuarioNovo.setDtalter(java.time.LocalDateTime.now());
-                usuarioDao.updateByID(usuarioNovo);
 
-                Usuario usuarioAposUpdate = (Usuario) usuarioDao.findByCpf(usuarioNovo.getCpf(), true);
-                if (usuarioAposUpdate != null) {
+                Usuario usuarioUpdate = (Usuario) usuarioDao.findById(usuarioNovo.getId(), false);
+                if (usuarioUpdate != null) {
+                    usuarioDao.updateByID(usuarioNovo);
                     System.out.println("Usuário atualizado com sucesso.");
-                    return usuarioAposUpdate;
+                
+                    return usuarioUpdate;
                 }
                 throw new IllegalArgumentException("Usuário não encontrado para atualização");
             }
