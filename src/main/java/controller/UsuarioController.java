@@ -35,7 +35,7 @@ public class UsuarioController {
 
                 Usuario usuarioAposUpdate = (Usuario) usuarioDao.findByCpf(usuarioNovo.getCpf(), true);
                 if (usuarioAposUpdate != null) {
-                    System.out.println("Usuário atulizado com sucesso.");
+                    System.out.println("Usuário atualizado com sucesso.");
                     return usuarioAposUpdate;
                 }
                 throw new IllegalArgumentException("Usuário não encontrado para atualização");
