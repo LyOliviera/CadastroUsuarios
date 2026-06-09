@@ -113,11 +113,11 @@ public class UsuarioDao implements CrudDao {
 
         try{
             String sqlConsultaById = "Select * from usuario where id = ?";
-            preparedStatement = connection.prepareStatement(sqlConsultaById);
-            preparedStatement.setInt(1,id);
             if (ativos){
                 sqlConsultaById = sqlConsultaById + " and ativo = true";
             }
+            preparedStatement = connection.prepareStatement(sqlConsultaById);
+            preparedStatement.setInt(1,id);
 
             resultSet = preparedStatement.executeQuery();
 
